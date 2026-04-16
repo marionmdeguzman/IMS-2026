@@ -1,0 +1,62 @@
+{% extends 'base_admin.html' %}
+{% block title %}Email Blast — IMS{% endblock %}
+{% block page_title %}Email Blast{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Send Email Blast</h1>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+  <div class="card">
+    <div class="card-header"><h2>Compose Message</h2></div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors.0 }}</div>{% endif %}
+        <div class="form-group">
+          <label for="{{ form.subject.id_for_label }}">Subject</label>
+          {{ form.subject }}
+          {% if form.subject.errors %}<div class="err">{{ form.subject.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.body.id_for_label }}">Message Body</label>
+          {{ form.body }}
+          {% if form.body.errors %}<div class="err">{{ form.body.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label>Recipients</label>
+          <p style="font-size:0.8rem;color:#9CA3AF;margin-bottom:0.5rem;">{{ form.recipients.help_text }}</p>
+          <div style="max-height:200px;overflow-y:auto;border:1.5px solid #E5E7EB;border-radius:8px;padding:0.75rem;">
+            {{ form.recipients }}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send Email Blast
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>Recent Blasts</h2></div>
+    {% if blasts %}
+      <table class="data-table">
+        <thead><tr><th>Subject</th><th>Sent</th><th>By</th></tr></thead>
+        <tbody>
+          {% for blast in blasts %}
+          <tr>
+            <td style="font-weight:500;">{{ blast.subject|truncatechars:40 }}</td>
+            <td style="color:#9CA3AF;white-space:nowrap;">{{ blast.sent_at|date:"M j, Y" }}</td>
+            <td style="color:#9CA3AF;">{{ blast.sent_by.get_full_name|default:"—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div style="padding:2rem;text-align:center;color:#9CA3AF;font-size:0.875rem;">No blasts sent yet.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

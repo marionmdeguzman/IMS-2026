@@ -1,0 +1,52 @@
+{% extends 'base_admin.html' %}
+{% block title %}Staff — IMS{% endblock %}
+{% block page_title %}Staff Members{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Staff Members</h1>
+</div>
+
+<div class="card">
+  {% if staff %}
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Specialization</th><th>Services</th><th>Available</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for s in staff %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#4F46E5);
+                          display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.8rem;">
+                {{ s.user.initials }}
+              </div>
+              <div>
+                <div style="font-weight:600;">{{ s.get_full_name }}</div>
+                <div style="font-size:0.75rem;color:#9CA3AF;">{{ s.user.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td style="color:#6B7280;">{{ s.specialization|default:"—" }}</td>
+          <td>
+            {% for svc in s.services.all %}
+              <span style="font-size:0.75rem;padding:2px 6px;background:#EEF2FF;color:#6366F1;border-radius:4px;margin:1px;display:inline-block;">{{ svc.name }}</span>
+            {% empty %}
+              <span style="color:#9CA3AF;font-size:0.875rem;">None assigned</span>
+            {% endfor %}
+          </td>
+          <td>
+            {% if s.is_available %}<span class="badge status-active">Yes</span>
+            {% else %}<span class="badge status-inactive">No</span>{% endif %}
+          </td>
+          <td><a href="{% url 'services:staff_detail' s.pk %}" class="btn btn-ghost btn-xs">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div style="padding:3rem;text-align:center;color:#9CA3AF;">
+      <p>No staff members found. Create users with the Owner, Admin, or Staff role to see them here.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,390 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}IMS — Admin{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/ims.css' %}">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F1F5FB; color: var(--gray-900); min-height: 100vh;
+      display: flex; animation: bodyFadeIn 0.3s ease both;
+    }
+    @keyframes bodyFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w); background: var(--sidebar-bg);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+    }
+    .sidebar-brand {
+      height: var(--topbar-h); display: flex; align-items: center; gap: 0.65rem;
+      padding: 0 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    .brand-icon {
+      width: 36px; height: 36px; background: var(--indigo-500);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .brand-icon svg { width: 20px; height: 20px; stroke: white; fill: none; stroke-width: 2; }
+    .brand-name { font-weight: 700; font-size: 1.05rem; color: white; letter-spacing: -0.01em; }
+    .brand-sub  { font-size: 0.68rem; color: var(--sidebar-text); margin-top: 1px; }
+
+    .sidebar-nav { flex: 1; padding: 1rem 0.75rem; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+    .nav-section-label {
+      font-size: 0.63rem; font-weight: 700; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0.5rem 0.75rem 0.25rem; margin-top: 0.5rem;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.6rem 0.75rem; border-radius: var(--r-sm);
+      color: var(--sidebar-text); text-decoration: none;
+      font-size: 0.875rem; font-weight: 500;
+      transition: background var(--t), color var(--t);
+    }
+    .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.7; transition: opacity var(--t); }
+    .nav-item:hover { background: var(--sidebar-hover); color: white; }
+    .nav-item:hover svg { opacity: 1; }
+    .nav-item.active { background: var(--sidebar-active); color: white; font-weight: 600; }
+    .nav-item.active svg { opacity: 1; }
+
+    .sidebar-footer { padding: 1rem 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+    .sidebar-user { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; }
+    .sidebar-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #6366F1, #4F46E5);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    .sidebar-user-name { font-size: 0.8125rem; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-user-role { font-size: 0.68rem; color: #64748B; }
+    .nav-logout {
+      display: flex; align-items: center; gap: 0.75rem; width: 100%;
+      padding: 0.6rem 0.75rem; border-radius: var(--r-sm);
+      background: none; border: none; cursor: pointer;
+      color: var(--sidebar-text); font-size: 0.875rem; font-weight: 500;
+      font-family: inherit; transition: background var(--t), color var(--t);
+    }
+    .nav-logout svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.7; }
+    .nav-logout:hover { background: #7F1D1D; color: #FCA5A5; }
+    .nav-logout:hover svg { opacity: 1; }
+
+    /* Main layout */
+    .main-wrap { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* Topbar */
+    .topbar {
+      height: var(--topbar-h); background: white; border-bottom: 1px solid var(--gray-200);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.75rem; position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 1rem; }
+    .topbar-title { font-size: 1.05rem; font-weight: 700; color: var(--gray-900); }
+    .topbar-right { display: flex; align-items: center; gap: 1rem; }
+    .notif-btn {
+      position: relative; width: 36px; height: 36px; border-radius: 50%;
+      background: var(--gray-100); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--t); text-decoration: none; color: var(--gray-700);
+    }
+    .notif-btn:hover { background: var(--gray-200); }
+    .notif-btn svg { width: 18px; height: 18px; }
+    .notif-badge {
+      position: absolute; top: -3px; right: -3px;
+      background: #EF4444; color: white; font-size: 0.6rem; font-weight: 700;
+      width: 17px; height: 17px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid white;
+    }
+    .user-avatar-sm {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, #6366F1, #4F46E5);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 0.875rem;
+    }
+
+    /* Page content */
+    .page-content { padding: 2rem; flex: 1; }
+
+    /* Cards */
+    .card { background: white; border-radius: var(--r-lg); box-shadow: var(--shadow-card); }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .card-header h2 { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+    .card-body { padding: 1.5rem; }
+
+    /* Inputs */
+    input[type="text"], input[type="email"], input[type="password"], input[type="number"],
+    input[type="tel"], input[type="date"], input[type="time"], input[type="search"], select, textarea {
+      width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid var(--gray-200);
+      border-radius: var(--r-sm); font-size: 0.9rem; font-family: inherit;
+      color: var(--gray-900); background: white;
+      transition: border-color var(--t), box-shadow var(--t); outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--indigo-500); box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+    }
+    input::placeholder, textarea::placeholder { color: var(--gray-400); }
+    select option { color: var(--gray-900); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.6rem 1.2rem; border: none; border-radius: var(--r-sm);
+      font-size: 0.875rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all var(--t); text-decoration: none;
+    }
+    .btn-primary { background: var(--indigo-500); color: white; }
+    .btn-primary:hover { background: var(--indigo-600); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-ghost { background: white; color: var(--indigo-500); border: 1.5px solid var(--purple-200); }
+    .btn-ghost:hover { background: var(--purple-50); border-color: var(--indigo-500); }
+    .btn-danger { background: var(--red-100); color: var(--red-600); border: 1.5px solid #FCA5A5; }
+    .btn-danger:hover { background: var(--red-600); color: white; border-color: var(--red-600); }
+    .btn-success { background: var(--green-100); color: var(--green-700); border: 1.5px solid #86EFAC; }
+    .btn-success:hover { background: var(--green-600); color: white; }
+    .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.8125rem; }
+    .btn-xs { padding: 0.25rem 0.6rem; font-size: 0.75rem; }
+
+    /* Alerts */
+    .alert {
+      padding: 0.75rem 1rem; border-radius: var(--r-sm); font-size: 0.875rem;
+      margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .alert-success { background: var(--green-50); color: var(--green-700); border: 1px solid #BBF7D0; }
+    .alert-error   { background: var(--red-50);   color: var(--red-600);   border: 1px solid #FECACA; }
+    .alert-warning { background: var(--amber-100); color: var(--amber-600); border: 1px solid #FDE68A; }
+    .alert-info    { background: var(--purple-50); color: var(--purple-700); border: 1px solid var(--purple-200); }
+
+    /* Table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .data-table thead th {
+      background: var(--gray-50); padding: 0.7rem 1rem; text-align: left;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--gray-500);
+      border-bottom: 2px solid var(--gray-200); white-space: nowrap;
+    }
+    .data-table tbody td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); vertical-align: middle; }
+    .data-table tbody tr { transition: background var(--t); }
+    .data-table tbody tr:hover { background: var(--gray-50); }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+
+    /* Form group */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.35rem; letter-spacing: 0.01em; }
+    .form-group .err { font-size: 0.8rem; color: var(--red-600); margin-top: 0.3rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+    /* Search */
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap input { padding-left: 2.5rem; }
+    .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--gray-400); pointer-events: none; }
+
+    /* Stat cards */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+    .stat-card {
+      background: white; border-radius: var(--r-lg); box-shadow: var(--shadow-card);
+      padding: 1.5rem; display: flex; align-items: flex-start; gap: 1rem;
+    }
+    .stat-icon {
+      width: 48px; height: 48px; border-radius: var(--r); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stat-icon svg { width: 24px; height: 24px; }
+    .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--gray-900); line-height: 1.1; }
+    .stat-label { font-size: 0.8125rem; color: var(--gray-500); margin-top: 0.25rem; }
+
+    /* Modal */
+    .modal-overlay {
+      display: flex !important; visibility: hidden; opacity: 0; pointer-events: none;
+      position: fixed; inset: 0; background: rgba(15,23,42,0.5); z-index: 200;
+      backdrop-filter: blur(2px); align-items: center; justify-content: center;
+      transition: opacity 0.22s ease, visibility 0.22s ease;
+    }
+    .modal-overlay.open { visibility: visible; opacity: 1; pointer-events: all; }
+    .modal {
+      background: white; border-radius: var(--r-lg); max-width: 480px;
+      width: calc(100% - 2rem); padding: 1.75rem;
+      transform: translateY(14px) scale(0.97);
+      transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), opacity 0.22s ease;
+      opacity: 0;
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); opacity: 1; }
+    .modal-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .modal-desc  { font-size: 0.875rem; color: var(--gray-500); margin-bottom: 1.25rem; line-height: 1.6; }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem; }
+
+    /* Content row for page headers */
+    .page-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .page-header h1 { font-size: 1.35rem; font-weight: 800; color: var(--gray-900); }
+
+    /* Filter row */
+    .filter-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+
+    /* Tag pill */
+    .tag-pill { display: inline-flex; align-items: center; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600; margin: 1px; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- Mobile sidebar overlay -->
+<div class="sidebar-overlay"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">IMS</div>
+      <div class="brand-sub">Integrated Management</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">Overview</span>
+    <a href="{% url 'dashboard:overview' %}" class="nav-item {% if request.resolver_match.url_name == 'overview' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Dashboard
+    </a>
+
+    <span class="nav-section-label">Members</span>
+    <a href="{% url 'members:member_list' %}" class="nav-item {% if 'member_list' in request.resolver_match.url_name or 'member_detail' in request.resolver_match.url_name %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      All Members
+    </a>
+    <a href="{% url 'members:member_create' %}" class="nav-item {% if request.resolver_match.url_name == 'member_create' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      Add Member
+    </a>
+    <a href="{% url 'members:member_import' %}" class="nav-item {% if request.resolver_match.url_name == 'member_import' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+      Import CSV
+    </a>
+
+    <span class="nav-section-label">Bookings</span>
+    <a href="{% url 'bookings:appointment_list' %}" class="nav-item {% if request.resolver_match.url_name == 'appointment_list' or request.resolver_match.url_name == 'appointment_detail' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      All Bookings
+    </a>
+    <a href="{% url 'bookings:calendar' %}" class="nav-item {% if request.resolver_match.url_name == 'calendar' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+      Calendar
+    </a>
+    <a href="{% url 'bookings:appointment_create' %}" class="nav-item {% if request.resolver_match.url_name == 'appointment_create' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+      New Booking
+    </a>
+
+    <span class="nav-section-label">Services & Staff</span>
+    <a href="{% url 'services:service_list' %}" class="nav-item {% if 'service' in request.resolver_match.url_name %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
+      Services
+    </a>
+    <a href="{% url 'services:staff_list' %}" class="nav-item {% if 'staff' in request.resolver_match.url_name %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Staff
+    </a>
+
+    <span class="nav-section-label">Billing</span>
+    <a href="{% url 'billing:payment_list' %}" class="nav-item {% if request.resolver_match.url_name == 'payment_list' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Payments
+    </a>
+    <a href="{% url 'billing:membership_list' %}" class="nav-item {% if request.resolver_match.url_name == 'membership_list' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Memberships
+    </a>
+    <a href="{% url 'billing:plan_list' %}" class="nav-item {% if 'plan' in request.resolver_match.url_name %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      Plans
+    </a>
+
+    <span class="nav-section-label">Reports</span>
+    <a href="{% url 'billing:revenue_report' %}" class="nav-item {% if request.resolver_match.url_name == 'revenue_report' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Revenue
+    </a>
+    <a href="{% url 'dashboard:no_show_report' %}" class="nav-item {% if request.resolver_match.url_name == 'no_show_report' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+      No-Shows
+    </a>
+
+    <span class="nav-section-label">Communication</span>
+    <a href="{% url 'notifications:notification_list' %}" class="nav-item {% if request.resolver_match.url_name == 'notification_list' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      Notifications
+    </a>
+    <a href="{% url 'notifications:email_blast' %}" class="nav-item {% if request.resolver_match.url_name == 'email_blast' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16"/><polyline points="22 2 12 12"/><polyline points="22 2 15 2 22 9"/></svg>
+      Email Blast
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">{{ request.user.initials }}</div>
+      <div style="overflow: hidden;">
+        <div class="sidebar-user-name">{{ request.user.get_full_name }}</div>
+        <div class="sidebar-user-role">{{ request.user.get_role_display }}</div>
+      </div>
+    </div>
+    <form action="{% url 'accounts:staff_logout' %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="nav-logout" data-no-loading>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </form>
+  </div>
+</aside>
+
+<div class="main-wrap">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h1 class="topbar-title">{% block page_title %}Dashboard{% endblock %}</h1>
+    </div>
+    <div class="topbar-right">
+      <a href="{% url 'notifications:notification_list' %}" class="notif-btn" title="Notifications" data-no-loading>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        {% if unread_notification_count > 0 %}
+          <span class="notif-badge">{{ unread_notification_count }}</span>
+        {% endif %}
+      </a>
+      <div class="user-avatar-sm" title="{{ request.user.get_full_name }}">{{ request.user.initials }}</div>
+    </div>
+  </header>
+
+  <main class="page-content">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-error{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+{% block extra_body %}{% endblock %}
+<script src="{% static 'js/ims.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

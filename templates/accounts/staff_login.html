@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Login — IMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/ims.css' %}">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif; background: #0F172A;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    }
+    .login-panel {
+      width: 100%; max-width: 420px; margin: 2rem;
+      background: white; border-radius: 20px; padding: 2.5rem;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+    }
+    .login-logo { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; }
+    .logo-icon {
+      width: 44px; height: 44px; background: #6366F1; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 22px; height: 22px; stroke: white; fill: none; stroke-width: 2; }
+    .logo-text { font-size: 1.35rem; font-weight: 800; color: #111827; }
+    .logo-sub { font-size: 0.75rem; color: #6B7280; margin-top: 1px; }
+    h1 { font-size: 1.4rem; font-weight: 800; color: #111827; margin-bottom: 0.35rem; }
+    .sub { font-size: 0.875rem; color: #6B7280; margin-bottom: 1.75rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.8125rem; font-weight: 600; color: #374151; margin-bottom: 0.35rem; }
+    input[type="email"], input[type="password"] {
+      width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid #E5E7EB;
+      border-radius: 8px; font-size: 0.9rem; font-family: inherit;
+      color: #111827; outline: none; transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    input:focus { border-color: #6366F1; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+    input::placeholder { color: #9CA3AF; }
+    .err { font-size: 0.8rem; color: #DC2626; margin-top: 0.3rem; }
+    .btn {
+      width: 100%; padding: 0.72rem; background: #6366F1; color: white;
+      border: none; border-radius: 8px; font-size: 0.9375rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; transition: all 0.18s;
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+    }
+    .btn:hover { background: #4F46E5; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(99,102,241,0.3); }
+    .alert-error {
+      background: #FFF5F5; color: #DC2626; border: 1px solid #FECACA;
+      padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.875rem; margin-bottom: 1.25rem;
+    }
+    .footer-link { text-align: center; margin-top: 1.5rem; font-size: 0.8125rem; color: #9CA3AF; }
+    .footer-link a { color: #6366F1; text-decoration: none; font-weight: 500; }
+    .footer-link a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="login-panel">
+  <div class="login-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    </div>
+    <div>
+      <div class="logo-text">IMS</div>
+      <div class="logo-sub">Integrated Management System</div>
+    </div>
+  </div>
+
+  <h1>Staff Login</h1>
+  <p class="sub">Sign in with your staff credentials to access the admin portal.</p>
+
+  {% if form.non_field_errors %}
+    <div class="alert-error">{{ form.non_field_errors.0 }}</div>
+  {% endif %}
+
+  <form method="post" action="{% url 'accounts:staff_login' %}">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="{{ form.email.id_for_label }}">Email Address</label>
+      {{ form.email }}
+      {% if form.email.errors %}<div class="err">{{ form.email.errors.0 }}</div>{% endif %}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.password.id_for_label }}">Password</label>
+      {{ form.password }}
+      {% if form.password.errors %}<div class="err">{{ form.password.errors.0 }}</div>{% endif %}
+    </div>
+    <button type="submit" class="btn">Sign In</button>
+  </form>
+
+  <div class="footer-link">
+    <a href="{% url 'bookings_public:public_booking' %}">Back to public booking &rarr;</a>
+  </div>
+</div>
+<script src="{% static 'js/ims.js' %}"></script>
+</body>
+</html>

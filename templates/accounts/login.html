@@ -1,0 +1,36 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Client Login — IMS{% endblock %}
+
+{% block body %}
+<div style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 60px);padding:2rem;">
+  <div class="card" style="width:100%;max-width:420px;">
+    <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:0.35rem;">Welcome back</h1>
+    <p style="color:#6B7280;font-size:0.875rem;margin-bottom:1.75rem;">Sign in to manage your bookings.</p>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="{{ form.email.id_for_label }}">Email Address</label>
+        {{ form.email }}
+        {% if form.email.errors %}<div class="err">{{ form.email.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+        {% if form.password.errors %}<div class="err">{{ form.password.errors.0 }}</div>{% endif %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:0.5rem;">Sign In</button>
+    </form>
+
+    <div class="rule">or</div>
+    <p style="text-align:center;font-size:0.875rem;color:#6B7280;">
+      Don't have an account? <a href="{% url 'accounts:register' %}" class="lnk">Create one</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

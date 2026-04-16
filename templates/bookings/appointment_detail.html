@@ -1,0 +1,95 @@
+{% extends 'base_admin.html' %}
+{% block title %}Booking #{{ appt.pk }} — IMS{% endblock %}
+{% block page_title %}Booking #{{ appt.pk }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div style="display:flex;align-items:center;gap:0.75rem;">
+    <a href="{% url 'bookings:appointment_list' %}" class="btn btn-ghost btn-sm">&larr; Bookings</a>
+    <h1>Booking #{{ appt.pk }}</h1>
+    <span class="badge status-{{ appt.status }}">{{ appt.get_status_display }}</span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+  <!-- Booking info -->
+  <div class="card">
+    <div class="card-header"><h2>Appointment Details</h2></div>
+    <div class="card-body">
+      <dl style="font-size:0.875rem;">
+        <div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #F3F4F6;">
+          <dt style="color:#9CA3AF;">Member</dt>
+          <dd>
+            <a href="{% url 'members:member_detail' appt.member.pk %}" style="color:#6366F1;text-decoration:none;font-weight:600;">
+              {{ appt.member.get_full_name }}
+            </a>
+          </dd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #F3F4F6;">
+          <dt style="color:#9CA3AF;">Service</dt>
+          <dd style="font-weight:500;">{{ appt.service.name }}</dd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #F3F4F6;">
+          <dt style="color:#9CA3AF;">Date</dt>
+          <dd style="font-weight:500;">{{ appt.date|date:"l, F j, Y" }}</dd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #F3F4F6;">
+          <dt style="color:#9CA3AF;">Time</dt>
+          <dd style="font-weight:500;">{{ appt.start_time|time:"g:i A" }} – {{ appt.end_time|time:"g:i A" }} ({{ appt.duration_display }})</dd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #F3F4F6;">
+          <dt style="color:#9CA3AF;">Staff</dt>
+          <dd style="font-weight:500;">{{ appt.staff.get_full_name|default:"Unassigned" }}</dd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #F3F4F6;">
+          <dt style="color:#9CA3AF;">Resource</dt>
+          <dd style="font-weight:500;">{{ appt.resource|default:"—" }}</dd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #F3F4F6;">
+          <dt style="color:#9CA3AF;">Booking Source</dt>
+          <dd><span style="font-size:0.8rem;padding:2px 8px;background:#F3F4F6;border-radius:999px;color:#6B7280;">{{ appt.get_booking_source_display }}</span></dd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.6rem 0;">
+          <dt style="color:#9CA3AF;">Created</dt>
+          <dd style="color:#6B7280;">{{ appt.created_at|date:"M j, Y g:i A" }}</dd>
+        </div>
+      </dl>
+      {% if appt.notes %}
+        <div style="margin-top:1rem;padding:0.75rem;background:#F9FAFB;border-radius:8px;font-size:0.875rem;color:#6B7280;">
+          <strong style="color:#374151;">Notes:</strong> {{ appt.notes }}
+        </div>
+      {% endif %}
+      {% if appt.cancellation_reason %}
+        <div style="margin-top:1rem;padding:0.75rem;background:#FFF5F5;border-radius:8px;font-size:0.875rem;color:#DC2626;">
+          <strong>Cancellation reason:</strong> {{ appt.cancellation_reason }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Update status -->
+  <div class="card" style="align-self:start;">
+    <div class="card-header"><h2>Update Status</h2></div>
+    <div class="card-body">
+      <form method="post" action="{% url 'bookings:appointment_update_status' appt.pk %}">
+        {% csrf_token %}
+        {% for field in status_form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="err">{{ field.errors.0 }}</div>{% endif %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary" style="width:100%;">Update Status</button>
+      </form>
+
+      <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #F3F4F6;">
+        <a href="{% url 'billing:payment_create' %}" class="btn btn-success" style="width:100%;margin-bottom:0.75rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          Log Payment
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

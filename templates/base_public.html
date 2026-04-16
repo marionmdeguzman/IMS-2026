@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}IMS{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/ims.css' %}">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(150deg, #EEF0FF 0%, #F0F4FF 50%, #EEF3FF 100%);
+      color: #111827; min-height: 100vh; line-height: 1.6;
+      animation: bodyFadeIn 0.3s ease both;
+    }
+    @keyframes bodyFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Public nav */
+    .pub-nav {
+      background: white; border-bottom: 1px solid #E5E7EB;
+      padding: 0 2rem; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .pub-brand { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; color: #111827; }
+    .pub-brand-icon {
+      width: 32px; height: 32px; background: #6366F1; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pub-brand-icon svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2; }
+    .pub-brand-name { font-weight: 700; font-size: 1rem; }
+    .pub-nav-links { display: flex; align-items: center; gap: 1rem; }
+
+    /* Inputs */
+    input[type="text"], input[type="email"], input[type="password"], input[type="number"],
+    input[type="tel"], input[type="date"], input[type="time"], select, textarea {
+      width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid #E5E7EB;
+      border-radius: 8px; font-size: 0.9375rem; font-family: inherit;
+      color: #111827; background: white; transition: border-color 0.18s ease, box-shadow 0.18s ease; outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #6366F1; box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    }
+    input::placeholder, textarea::placeholder { color: #9CA3AF; }
+
+    /* Alerts */
+    .alert {
+      padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.875rem;
+      margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.5;
+    }
+    .alert-success { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
+    .alert-error   { background: #FFF5F5; color: #DC2626; border: 1px solid #FECACA; }
+    .alert-warning { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.72rem 1.4rem; border: none; border-radius: 8px; font-size: 0.9375rem;
+      font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.18s ease; text-decoration: none;
+    }
+    .btn-primary { background: #6366F1; color: white; }
+    .btn-primary:hover { background: #4F46E5; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(99,102,241,0.32); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-ghost { background: transparent; color: #6366F1; border: 1.5px solid #C7D2FE; }
+    .btn-ghost:hover { background: #EEF2FF; }
+    .btn-full { width: 100%; }
+    .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+
+    /* Card */
+    .card {
+      background: white; border-radius: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 8px 24px rgba(99,102,241,0.07);
+      padding: 2rem;
+    }
+
+    /* Form group */
+    .form-group { margin-bottom: 1.1rem; }
+    .form-group label { display: block; font-size: 0.8125rem; font-weight: 600; color: #374151; margin-bottom: 0.35rem; letter-spacing: 0.01em; }
+    .form-group .err { font-size: 0.8rem; color: #DC2626; margin-top: 0.3rem; }
+
+    /* Link */
+    a.lnk { color: #6366F1; text-decoration: none; font-weight: 500; }
+    a.lnk:hover { text-decoration: underline; }
+
+    /* Divider */
+    .rule { display: flex; align-items: center; gap: 1rem; color: #9CA3AF; font-size: 0.8125rem; margin: 1.25rem 0; }
+    .rule::before, .rule::after { content: ''; flex: 1; height: 1px; background: #E5E7EB; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+<nav class="pub-nav">
+  <a href="{% url 'bookings_public:public_booking' %}" class="pub-brand">
+    <div class="pub-brand-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    </div>
+    <span class="pub-brand-name">IMS</span>
+  </a>
+  <div class="pub-nav-links">
+    <a href="{% url 'bookings_public:public_booking' %}" class="btn btn-primary btn-sm">Book Now</a>
+    <a href="{% url 'accounts:staff_login' %}" class="btn btn-ghost btn-sm">Staff Login</a>
+  </div>
+</nav>
+
+{% if messages %}
+  <div style="max-width:600px;margin:1rem auto;padding:0 1rem;">
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-error{% else %}alert-warning{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% block body %}{% endblock %}
+
+{% block extra_body %}{% endblock %}
+<script src="{% static 'js/ims.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

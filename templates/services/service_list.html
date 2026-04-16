@@ -1,0 +1,46 @@
+{% extends 'base_admin.html' %}
+{% block title %}Services — IMS{% endblock %}
+{% block page_title %}Services{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Services</h1>
+  <a href="{% url 'services:service_create' %}" class="btn btn-primary btn-sm">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    New Service
+  </a>
+</div>
+
+<div class="card">
+  {% if services %}
+    <table class="data-table">
+      <thead><tr><th>Service</th><th>Category</th><th>Duration</th><th>Price</th><th>Active</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for svc in services %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="width:12px;height:12px;border-radius:50%;background:{{ svc.color }};flex-shrink:0;"></div>
+              <span style="font-weight:600;color:#111827;">{{ svc.name }}</span>
+            </div>
+          </td>
+          <td style="color:#6B7280;">{{ svc.category|default:"—" }}</td>
+          <td>{{ svc.duration_minutes }} min</td>
+          <td style="font-weight:600;">₱{{ svc.price|floatformat:2 }}</td>
+          <td>
+            {% if svc.is_active %}<span class="badge status-active">Active</span>
+            {% else %}<span class="badge status-inactive">Inactive</span>{% endif %}
+          </td>
+          <td><a href="{% url 'services:service_edit' svc.pk %}" class="btn btn-ghost btn-xs">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div style="padding:3rem;text-align:center;color:#9CA3AF;">
+      <p>No services added yet.</p>
+      <a href="{% url 'services:service_create' %}" class="btn btn-primary btn-sm" style="margin-top:1rem;">Add First Service</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

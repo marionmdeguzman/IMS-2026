@@ -1,0 +1,45 @@
+{% extends 'base_admin.html' %}
+{% block title %}No-Show Report — IMS{% endblock %}
+{% block page_title %}No-Show Report{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>No-Show Report</h1>
+    <p style="color:#6B7280;font-size:0.875rem;">No-shows from {{ this_month_start|date:"F Y" }} · Total: {{ total }}</p>
+  </div>
+  <a href="{% url 'billing:revenue_report' %}" class="btn btn-ghost btn-sm">Revenue Report</a>
+</div>
+
+<div class="card">
+  {% if no_shows %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th><th>Member</th><th>Service</th><th>Staff</th><th>Booking Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appt in no_shows %}
+        <tr>
+          <td style="white-space:nowrap;font-weight:600;">{{ appt.date|date:"M j, Y" }}</td>
+          <td>
+            <a href="{% url 'members:member_detail' appt.member.pk %}" style="color:#6366F1;text-decoration:none;font-weight:500;">
+              {{ appt.member.get_full_name }}
+            </a>
+          </td>
+          <td>{{ appt.service.name }}</td>
+          <td>{{ appt.staff.get_full_name|default:"Unassigned" }}</td>
+          <td><span class="badge status-{{ appt.booking_source }}" style="background:#F3F4F6;color:#374151;">{{ appt.get_booking_source_display }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div style="padding:3rem;text-align:center;color:#9CA3AF;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 1rem;display:block;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+      <p style="font-size:0.9rem;font-weight:500;">No no-shows recorded this month.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

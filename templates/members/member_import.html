@@ -1,0 +1,53 @@
+{% extends 'base_admin.html' %}
+{% block title %}Import Members — IMS{% endblock %}
+{% block page_title %}Import Members CSV{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div style="display:flex;align-items:center;gap:0.75rem;">
+    <a href="{% url 'members:member_list' %}" class="btn btn-ghost btn-sm">&larr; Members</a>
+    <h1>Import Members via CSV</h1>
+  </div>
+</div>
+
+<div style="max-width:600px;">
+  <div class="card" style="margin-bottom:1.5rem;">
+    <div class="card-header"><h2>Upload CSV File</h2></div>
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="alert alert-error">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+        <div class="form-group">
+          <label for="{{ form.csv_file.id_for_label }}">CSV File</label>
+          {{ form.csv_file }}
+          {% if form.csv_file.errors %}<div class="err">{{ form.csv_file.errors.0 }}</div>{% endif %}
+          <div style="font-size:0.8rem;color:#9CA3AF;margin-top:0.5rem;">{{ form.csv_file.help_text }}</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload & Import</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>CSV Format Guide</h2></div>
+    <div class="card-body">
+      <p style="font-size:0.875rem;color:#6B7280;margin-bottom:1rem;">Your CSV file must include the following columns:</p>
+      <table class="data-table">
+        <thead><tr><th>Column</th><th>Required</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><code>first_name</code></td><td><span class="badge status-active">Yes</span></td><td>Juan</td></tr>
+          <tr><td><code>last_name</code></td><td><span class="badge status-active">Yes</span></td><td>Santos</td></tr>
+          <tr><td><code>email</code></td><td><span class="badge status-active">Yes</span></td><td>juan@email.com</td></tr>
+          <tr><td><code>phone</code></td><td><span class="badge status-no_show">No</span></td><td>+639171234567</td></tr>
+          <tr><td><code>notes</code></td><td><span class="badge status-no_show">No</span></td><td>VIP member</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:1rem;padding:0.75rem;background:#F5F3FF;border-radius:8px;font-size:0.8rem;color:#6D28D9;">
+        Members with existing emails will be skipped (no duplicate detection). The first row is treated as headers.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

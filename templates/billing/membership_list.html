@@ -1,0 +1,44 @@
+{% extends 'base_admin.html' %}
+{% block title %}Memberships — IMS{% endblock %}
+{% block page_title %}Memberships{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Memberships</h1>
+  <a href="{% url 'billing:plan_list' %}" class="btn btn-ghost btn-sm">Manage Plans</a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <form method="get" class="filter-row">
+      <select name="status" onchange="this.form.submit()" style="width:auto;padding:0.5rem 0.75rem;">
+        <option value="">All Statuses</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+      </select>
+    </form>
+  </div>
+  {% if memberships %}
+    <table class="data-table">
+      <thead><tr><th>Member</th><th>Plan</th><th>Price</th><th>Start</th><th>End</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for m in memberships %}
+        <tr>
+          <td>
+            <a href="{% url 'members:member_detail' m.member.pk %}" style="color:#6366F1;text-decoration:none;font-weight:500;">{{ m.member.get_full_name }}</a>
+          </td>
+          <td style="font-weight:500;">{{ m.plan.name }}</td>
+          <td>₱{{ m.plan.price|floatformat:2 }}</td>
+          <td>{{ m.start_date }}</td>
+          <td style="{% if m.status == 'expired' %}color:#DC2626;{% endif %}font-weight:{% if m.status == 'expired' %}600{% else %}400{% endif %};">{{ m.end_date }}</td>
+          <td><span class="badge status-{{ m.status }}">{{ m.get_status_display }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div style="padding:3rem;text-align:center;color:#9CA3AF;"><p style="font-size:0.9rem;">No memberships found.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

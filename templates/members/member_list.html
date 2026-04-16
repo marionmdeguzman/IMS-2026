@@ -1,0 +1,118 @@
+{% extends 'base_admin.html' %}
+{% block title %}Members — IMS{% endblock %}
+{% block page_title %}Members{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Members</h1>
+    <p style="color:#6B7280;font-size:0.875rem;">{{ members|length }} member{{ members|length|pluralize }}</p>
+  </div>
+  <div style="display:flex;gap:0.75rem;">
+    <a href="{% url 'members:member_import' %}" class="btn btn-ghost btn-sm">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+      Import CSV
+    </a>
+    <a href="{% url 'members:member_create' %}" class="btn btn-primary btn-sm">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Member
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="filter-row">
+      <!-- Client-side search -->
+      <div class="search-wrap" style="min-width:240px;">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="member-search-input" placeholder="Search members…" value="{{ search }}" style="padding-left:2.5rem;">
+      </div>
+      <!-- Status filter -->
+      <form method="get" style="display:flex;gap:0.5rem;align-items:center;">
+        {% if search %}<input type="hidden" name="q" value="{{ search }}">{% endif %}
+        <select name="status" onchange="this.form.submit()" style="width:auto;padding:0.5rem 0.75rem;">
+          <option value="">All Statuses</option>
+          <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+          <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+        <!-- Tag filter -->
+        <select name="tag" onchange="this.form.submit()" style="width:auto;padding:0.5rem 0.75rem;">
+          <option value="">All Tags</option>
+          {% for tag in tags %}
+            <option value="{{ tag.pk }}" {% if tag_filter == tag.pk|stringformat:"s" %}selected{% endif %}>{{ tag.name }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </div>
+
+  {% if members %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Member</th><th>Email</th><th>Phone</th><th>Tags</th><th>Membership</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for member in members %}
+        <tr class="member-row">
+          <td>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#4F46E5);
+                          display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.8rem;flex-shrink:0;">
+                {{ member.initials }}
+              </div>
+              <div>
+                <div style="font-weight:600;color:#111827;">{{ member.get_full_name }}</div>
+                {% if member.last_visit %}
+                  <div style="font-size:0.75rem;color:#9CA3AF;">Last visit: {{ member.last_visit }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+          <td style="color:#6B7280;">{{ member.email }}</td>
+          <td style="color:#6B7280;">{{ member.phone }}</td>
+          <td>
+            {% for tag in member.tags.all %}
+              <span class="tag-pill" style="background:{{ tag.color }}22;color:{{ tag.color }};">{{ tag.name }}</span>
+            {% endfor %}
+          </td>
+          <td>
+            {% with mem=member.active_membership %}
+              {% if mem %}
+                <span style="font-size:0.8rem;font-weight:600;color:#065F46;">{{ mem.plan.name }}</span>
+                <div style="font-size:0.72rem;color:#9CA3AF;">until {{ mem.end_date }}</div>
+              {% else %}
+                <span style="font-size:0.8rem;color:#9CA3AF;">None</span>
+              {% endif %}
+            {% endwith %}
+          </td>
+          <td><span class="badge status-{{ member.status }}">{{ member.get_status_display }}</span></td>
+          <td>
+            <div style="display:flex;gap:0.4rem;">
+              <a href="{% url 'members:member_detail' member.pk %}" class="btn btn-ghost btn-xs">View</a>
+              <a href="{% url 'members:member_edit' member.pk %}" class="btn btn-ghost btn-xs">Edit</a>
+              <form method="post" action="{% url 'members:member_archive' member.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-xs" data-no-loading
+                        data-confirm="Archive {{ member.get_full_name }}? They will no longer appear in the active list."
+                        data-confirm-title="Archive Member">
+                  Archive
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div style="padding:3rem;text-align:center;color:#9CA3AF;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 1rem;display:block;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      <p style="font-size:0.9rem;font-weight:500;">No members found.</p>
+      <a href="{% url 'members:member_create' %}" class="btn btn-primary btn-sm" style="margin-top:1rem;">Add First Member</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

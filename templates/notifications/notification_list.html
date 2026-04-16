@@ -1,0 +1,35 @@
+{% extends 'base_admin.html' %}
+{% block title %}Notifications — IMS{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Notifications</h1>
+  <a href="{% url 'notifications:email_blast' %}" class="btn btn-ghost btn-sm">Email Blast</a>
+</div>
+
+<div class="card">
+  {% if notifications %}
+    <div style="divide-y:1px solid #F3F4F6;">
+      {% for notif in notifications %}
+        <div style="padding:1rem 1.5rem;border-bottom:1px solid #F3F4F6;display:flex;align-items:flex-start;gap:1rem;{% if not notif.is_read %}background:#FAFAFA;{% endif %}">
+          <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:6px;
+                      background:{% if notif.notification_type == 'appointment' %}#6366F1{% elif notif.notification_type == 'membership' %}#D97706{% elif notif.notification_type == 'payment' %}#16A34A{% else %}#6B7280{% endif %};">
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:{% if not notif.is_read %}600{% else %}400{% endif %};color:#111827;">{{ notif.title }}</div>
+            <div style="font-size:0.875rem;color:#6B7280;margin-top:0.2rem;">{{ notif.message }}</div>
+            <div style="font-size:0.75rem;color:#9CA3AF;margin-top:0.35rem;">{{ notif.created_at|date:"M j, Y g:i A" }}</div>
+          </div>
+          <span class="badge" style="background:#F3F4F6;color:#6B7280;flex-shrink:0;">{{ notif.get_notification_type_display }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="padding:3rem;text-align:center;color:#9CA3AF;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 1rem;display:block;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <p style="font-size:0.9rem;">No notifications yet.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

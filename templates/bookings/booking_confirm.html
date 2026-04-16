@@ -1,0 +1,52 @@
+{% extends 'base_public.html' %}
+{% block title %}Booking Confirmed — IMS{% endblock %}
+
+{% block body %}
+<div style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 60px);padding:2rem;">
+  <div class="card" style="max-width:520px;width:100%;text-align:center;">
+    <div style="width:64px;height:64px;border-radius:50%;background:#D1FAE5;
+                display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#065F46" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h1 style="font-size:1.5rem;font-weight:800;color:#111827;margin-bottom:0.5rem;">Booking Requested!</h1>
+    <p style="color:#6B7280;font-size:0.9rem;margin-bottom:1.75rem;">
+      Your booking request has been submitted. We'll confirm it shortly.
+    </p>
+
+    <div style="background:#F9FAFB;border-radius:12px;padding:1.25rem;text-align:left;margin-bottom:1.75rem;">
+      <dl style="font-size:0.875rem;">
+        <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #E5E7EB;">
+          <dt style="color:#9CA3AF;">Member</dt>
+          <dd style="font-weight:600;">{{ appt.member.get_full_name }}</dd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #E5E7EB;">
+          <dt style="color:#9CA3AF;">Service</dt>
+          <dd style="font-weight:600;">{{ appt.service.name }}</dd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #E5E7EB;">
+          <dt style="color:#9CA3AF;">Date</dt>
+          <dd style="font-weight:600;">{{ appt.date|date:"l, F j, Y" }}</dd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #E5E7EB;">
+          <dt style="color:#9CA3AF;">Time</dt>
+          <dd style="font-weight:600;">{{ appt.start_time|time:"g:i A" }} – {{ appt.end_time|time:"g:i A" }}</dd>
+        </div>
+        {% if appt.staff %}
+        <div style="display:flex;justify-content:space-between;padding:0.5rem 0;">
+          <dt style="color:#9CA3AF;">Staff</dt>
+          <dd style="font-weight:600;">{{ appt.staff.get_full_name }}</dd>
+        </div>
+        {% endif %}
+      </dl>
+    </div>
+
+    <span class="badge status-{{ appt.status }}" style="font-size:0.875rem;padding:6px 16px;margin-bottom:1.5rem;display:inline-block;">
+      Status: {{ appt.get_status_display }}
+    </span>
+
+    <div style="margin-top:0.5rem;">
+      <a href="{% url 'bookings_public:public_booking' %}" class="btn btn-primary">Book Another Session</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Register — IMS{% endblock %}
+
+{% block body %}
+<div style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 60px);padding:2rem;">
+  <div class="card" style="width:100%;max-width:480px;">
+    <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:0.35rem;">Create your account</h1>
+    <p style="color:#6B7280;font-size:0.875rem;margin-bottom:1.75rem;">Join IMS to manage your bookings and memberships.</p>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group">
+          <label for="{{ form.first_name.id_for_label }}">First Name</label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}<div class="err">{{ form.first_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}<div class="err">{{ form.last_name.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="{{ form.email.id_for_label }}">Email Address</label>
+        {{ form.email }}
+        {% if form.email.errors %}<div class="err">{{ form.email.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.phone.id_for_label }}">Phone Number</label>
+        {{ form.phone }}
+        {% if form.phone.errors %}<div class="err">{{ form.phone.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+        {% if form.password.errors %}<div class="err">{{ form.password.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.confirm_password.id_for_label }}">Confirm Password</label>
+        {{ form.confirm_password }}
+        {% if form.confirm_password.errors %}<div class="err">{{ form.confirm_password.errors.0 }}</div>{% endif %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:0.5rem;">Create Account</button>
+    </form>
+
+    <div class="rule">or</div>
+    <p style="text-align:center;font-size:0.875rem;color:#6B7280;">
+      Already have an account? <a href="{% url 'accounts:login' %}" class="lnk">Sign in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

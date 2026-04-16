@@ -1,0 +1,63 @@
+{% extends 'base_admin.html' %}
+{% block title %}Calendar — IMS{% endblock %}
+{% block page_title %}Booking Calendar{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<style>
+  #calendar-container { background: white; border-radius: 16px; box-shadow: var(--shadow-card); padding: 1.5rem; }
+  .fc-toolbar-title { font-size: 1rem !important; font-weight: 700 !important; }
+  .fc-button { background: var(--indigo-500) !important; border-color: var(--indigo-500) !important; font-family: 'Inter', sans-serif !important; }
+  .fc-button:hover { background: var(--indigo-600) !important; }
+  .fc-button-active { background: var(--indigo-700) !important; border-color: var(--indigo-700) !important; }
+  .fc-event { border-radius: 6px; padding: 2px 4px; font-size: 0.8rem; cursor: pointer; }
+  .fc-daygrid-event-dot { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Booking Calendar</h1>
+  <div style="display:flex;gap:0.75rem;">
+    <a href="{% url 'bookings:appointment_list' %}" class="btn btn-ghost btn-sm">List View</a>
+    <a href="{% url 'bookings:appointment_create' %}" class="btn btn-primary btn-sm">New Booking</a>
+  </div>
+</div>
+
+<div id="calendar-container">
+  <div id="calendar"></div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const calendarEl = document.getElementById('calendar');
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    height: 'auto',
+    events: '{% url "bookings:calendar_events" %}',
+    eventClick: function (info) {
+      if (info.event.url) {
+        window.location.href = info.event.url;
+        info.jsEvent.preventDefault();
+      }
+    },
+    eventDidMount: function (info) {
+      const status = info.event.extendedProps.status;
+      const staff = info.event.extendedProps.staff;
+      info.el.title = `${info.event.title}\nStaff: ${staff}\nStatus: ${status}`;
+    },
+    nowIndicator: true,
+    businessHours: { daysOfWeek: [1, 2, 3, 4, 5, 6], startTime: '07:00', endTime: '20:00' },
+  });
+  calendar.render();
+});
+</script>
+{% endblock %}
